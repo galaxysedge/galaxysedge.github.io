@@ -34,9 +34,10 @@ monImage.src = "images/mouse.png"
 
 var hero = {
     speed: 8,
+	speedx: 0,
+	speedy: 0,
     x: Math.round(canvas.x/2),
     y: Math.round(canvas.y/2)
-	
 };
 var monster = {
     x: 0,
@@ -47,24 +48,23 @@ var monstersCaught = 0;
 // Player input
 
 var eventQ = [];
-//var keysDown = {};
+var keysPressed = {};
 
 addEventListener("keydown", function (e) {
-	eventQ.push(e.keyCode);
-
-
-/* 	if (! (e.keyCode in keysDown)) {
-		keysDown[e.keyCode] = 0;
+	if (!(e.keyCode in keysPressed)) {
+		eventQ.push(e.keyCode);
+		keysPressed[e.keyCode] = true;
 	}
-	keysDown[e.keyCode] ++; */
 }, false);
 
+addEventListener("keyup", function (e) {
+	eventQ.push(-e.keyCode);
+	delete keysPressed[e.keyCode];
+}, false);
 
 // New game
 
 var reset = function () {
-
-    
     monster.x = 1 + Math.round((Math.random() * (canvas.x - 2)));
     monster.y = 1 + Math.round((Math.random() * (canvas.y - 2)))
 };
@@ -78,7 +78,6 @@ var mov = {
 	40: [0,1 ] //Down
 };
 
-
 var epsilon = 0.00000001;
 
 var update = function (modifier) {
@@ -87,12 +86,19 @@ var update = function (modifier) {
 	if (eventQ.length != 0) {
 		// Move the hero
 		var e = eventQ[0];
-		if( e in mov ) {
-			var dir = mov[e]; 
-			hero.x += hero.speed*modifier*dir[0];
-			hero.y += hero.speed*modifier*dir[1];
+		var keyCode = Math.abs(e);
+		if( keyCode in mov ) {
+			if( e>0 ) {
+				hero.speedx = hero.speed*mov[keyCode][0];
+			} else {
+				
+			}
+		
+		
 			// Check if integer boundary has passed
-			if (Math.floor(oldx + epsilon*dir[0]).toFixed(0) != Math.floor(hero.x).toFixed(0)) {
+
+			
+			/* 			if (Math.floor(oldx + epsilon*dir[0]).toFixed(0) != Math.floor(hero.x).toFixed(0)) {
 			
 				if (eventQ.length <= 1 || eventQ[0] != eventQ[1]) {
 					hero.x = Math.floor(oldx+(dir[0]+1)/2);
@@ -104,30 +110,13 @@ var update = function (modifier) {
 					hero.y = Math.floor(oldy + (dir[1]+1)/2);
 				}
 				eventQ.shift();
-			};
+			}; */
 		}
-	};		
-
-// check event queue (list of keycodes - keysdown)
-// if not empty, process first item
-// check direction, start moving (record original position)
-// at end of the move, check if you've moved at least one tile
-// check if integer boundary crossed, if so then delete item and then:
-// if next event is same direction, carry on
-// otherwise, truncate original position and add one 
-
-
-
-/* 	for (var keyCode in keysDown) {
-		if (keyCode in mov) {
-			hero.x += mov[keyCode][0];
-			hero.y += mov[keyCode][1];
-		}
-		delete keysDown[keyCode];
-	} */
-
-    
-    // Are they touching?
+	};		 
+	hero.x += hero.speedx*modifier;
+	hero.y += hero.speedy*modifier;
+	
+		// Are they touching?
     if (
 		hero.x == monster.x && hero.y == monster.y
     ) {
