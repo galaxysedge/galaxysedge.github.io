@@ -62,14 +62,12 @@ addEventListener("keydown", function (e) {
 	if (Object.keys(keysPressed).length == 0 && e.keyCode in mov) {
 		eventQ.push(e.keyCode);
 		keysPressed[e.keyCode] = true;
-		console.log('Key down: ',e.keyCode);
 	}
 }, false);
 
 addEventListener("keyup", function (e) {
 	if (e.keyCode in mov) {
 		eventQ.push(-e.keyCode);
-		console.log('Key up: ',e.keyCode);
 		delete keysPressed[e.keyCode];
 	}
 }, false);
@@ -96,49 +94,33 @@ var update = function (modifier) {
 		// Move the hero
 		var e = eventQ[0];
 		var keyCode = Math.abs(e);
-		console.log('current queue ',eventQ);
 		if( keyCode in mov ) {
 			if( e>0 ) {
 				hero.speedx = hero.speed*mov[keyCode][0];
 				hero.speedy = hero.speed*mov[keyCode][1];
-				console.log('key down in update')
 			} else if (e<0) {
-				if (keyCode == 37 || keyCode == 39) { // left/right
+				if ((keyCode == 37 || keyCode == 39) && hero.speedx != 0) { // left/right
 					hero.targetx = Math.floor(hero.x)+(dirx+1)/2;
-					//hero.speedx = 0 // ONLY IF IN THE MIDDLE OF A TILE!
+					if (hero.targetx < 0) {hero.targetx = 0;}
+					else if (hero.targetx >= canvas.x) {hero.targetx = canvas.x-1;}
 				}				
-				if (keyCode == 38 || keyCode == 40) { // up/down
+				if ((keyCode == 38 || keyCode == 40) && hero.speedy != 0) { // up/down
 					hero.targety = Math.floor(hero.y)+(diry+1)/2;
-					//hero.speedy = 0;
-					console.log('key up in update u/d')
+					if (hero.targety < 0) {hero.targety = 0;}
+					else if (hero.targety >= canvas.y) {hero.targety = canvas.y-1;}
 				}
 			}
 			eventQ.shift();
-		
-			// Check if integer boundary has passed
-
-			
-			/* 			if (Math.floor(oldx + epsilon*dir[0]).toFixed(0) != Math.floor(hero.x).toFixed(0)) {
-			
-				if (eventQ.length <= 1 || eventQ[0] != eventQ[1]) {
-					hero.x = Math.floor(oldx+(dir[0]+1)/2);
-				}
-				eventQ.shift();
-			}
-			else if (Math.floor(oldy + epsilon*dir[1]).toFixed(0) != Math.floor(hero.y).toFixed(0) ) {
-				if (eventQ.length <= 1 || eventQ[0] != eventQ[1]) {
-					hero.y = Math.floor(oldy + (dir[1]+1)/2);
-				}
-				eventQ.shift();
-			}; */
 		}
 	};		 
-	if (hero.x+hero.speedx*modifier > 0 && hero.x+hero.speedx*modifier < canvas.x-1) {
-		hero.x += hero.speedx*modifier;
-	}
-	if (hero.y+hero.speedy*modifier > 0 && hero.y+hero.speedy*modifier < canvas.y-1) {
-		hero.y += hero.speedy*modifier;
-	}
+	hero.x += hero.speedx*modifier;
+	if (hero.x < 0) {hero.x = 0; hero.speedx = 0;}
+	else if (hero.x > canvas.x-1) {hero.x = canvas.x-1; hero.speedx = 0;}
+
+	hero.y += hero.speedy*modifier;
+	if (hero.y < 0) {hero.y = 0; hero.speedy = 0;}
+	else if (hero.y > canvas.y-1) {hero.y = canvas.y-1; hero.speedy = 0;}
+	
 	if (Object.keys(keysPressed).length == 0) {
 		if ((hero.targetx-hero.x)*dirx<0) {
 			hero.speedx = 0;
@@ -157,6 +139,7 @@ var update = function (modifier) {
         ++monstersCaught;
         reset();
     }
+	console.log(hero.x,hero.y,oldx,oldy);
 };
 
 // Render objects
