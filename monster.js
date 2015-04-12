@@ -51,9 +51,15 @@ var monstersCaught = 0;
 
 var eventQ = [];
 var keysPressed = {};
+var mov = {
+	37: [-1,0], //Left
+	38: [0,-1], //Up
+	39: [1,0 ], //Right
+	40: [0,1 ] //Down
+};
 
 addEventListener("keydown", function (e) {
-	if (Object.keys(keysPressed).length == 0) {
+	if (Object.keys(keysPressed).length == 0 && e.keyCode in mov) {
 		eventQ.push(e.keyCode);
 		keysPressed[e.keyCode] = true;
 		console.log('Key down: ',e.keyCode);
@@ -61,9 +67,11 @@ addEventListener("keydown", function (e) {
 }, false);
 
 addEventListener("keyup", function (e) {
-	eventQ.push(-e.keyCode);
-	console.log('Key up: ',e.keyCode);
-	delete keysPressed[e.keyCode];
+	if (e.keyCode in mov) {
+		eventQ.push(-e.keyCode);
+		console.log('Key up: ',e.keyCode);
+		delete keysPressed[e.keyCode];
+	}
 }, false);
 
 // New game
@@ -75,12 +83,7 @@ var reset = function () {
 
 // Update objects
 
-var mov = {
-	37: [-1,0], //Left
-	38: [0,-1], //Up
-	39: [1,0 ], //Right
-	40: [0,1 ] //Down
-};
+
 
 var epsilon = 0.00000001;
 
@@ -130,8 +133,12 @@ var update = function (modifier) {
 			}; */
 		}
 	};		 
-	hero.x += hero.speedx*modifier;
-	hero.y += hero.speedy*modifier;
+	if (hero.x+hero.speedx*modifier > 0 && hero.x+hero.speedx*modifier < canvas.x-1) {
+		hero.x += hero.speedx*modifier;
+	}
+	if (hero.y+hero.speedy*modifier > 0 && hero.y+hero.speedy*modifier < canvas.y-1) {
+		hero.y += hero.speedy*modifier;
+	}
 	if (Object.keys(keysPressed).length == 0) {
 		if ((hero.targetx-hero.x)*dirx<0) {
 			hero.speedx = 0;
