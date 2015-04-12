@@ -37,7 +37,9 @@ var hero = {
 	speedx: 0,
 	speedy: 0,
     x: Math.round(canvas.x/2),
-    y: Math.round(canvas.y/2)
+    y: Math.round(canvas.y/2),
+	targetx: Math.round(canvas.x/2),
+	targety: Math.round(canvas.y/2)
 };
 var monster = {
     x: 0,
@@ -51,14 +53,16 @@ var eventQ = [];
 var keysPressed = {};
 
 addEventListener("keydown", function (e) {
-	if (!(e.keyCode in keysPressed)) {
+	if (Object.keys(keysPressed).length == 0) {
 		eventQ.push(e.keyCode);
 		keysPressed[e.keyCode] = true;
+		console.log('Key down: ',e.keyCode);
 	}
 }, false);
 
 addEventListener("keyup", function (e) {
 	eventQ.push(-e.keyCode);
+	console.log('Key up: ',e.keyCode);
 	delete keysPressed[e.keyCode];
 }, false);
 
@@ -83,17 +87,30 @@ var epsilon = 0.00000001;
 var update = function (modifier) {
 	var oldx = hero.x;
 	var oldy = hero.y;
+	var dirx = hero.speedx/hero.speed;
+	var diry = hero.speedy/hero.speed;
 	if (eventQ.length != 0) {
 		// Move the hero
 		var e = eventQ[0];
 		var keyCode = Math.abs(e);
+		console.log('current queue ',eventQ);
 		if( keyCode in mov ) {
 			if( e>0 ) {
 				hero.speedx = hero.speed*mov[keyCode][0];
-			} else {
-				
+				hero.speedy = hero.speed*mov[keyCode][1];
+				console.log('key down in update')
+			} else if (e<0) {
+				if (keyCode == 37 || keyCode == 39) { // left/right
+					hero.targetx = Math.floor(hero.x)+(dirx+1)/2;
+					//hero.speedx = 0 // ONLY IF IN THE MIDDLE OF A TILE!
+				}				
+				if (keyCode == 38 || keyCode == 40) { // up/down
+					hero.targety = Math.floor(hero.y)+(diry+1)/2;
+					//hero.speedy = 0;
+					console.log('key up in update u/d')
+				}
 			}
-		
+			eventQ.shift();
 		
 			// Check if integer boundary has passed
 
@@ -115,7 +132,16 @@ var update = function (modifier) {
 	};		 
 	hero.x += hero.speedx*modifier;
 	hero.y += hero.speedy*modifier;
-	
+	if (Object.keys(keysPressed).length == 0) {
+		if ((hero.targetx-hero.x)*dirx<0) {
+			hero.speedx = 0;
+			hero.x = hero.targetx;
+		}
+		if ((hero.targety-hero.y)*diry<0) {
+			hero.speedy = 0;
+			hero.y = hero.targety;
+		}
+	}
 		// Are they touching?
     if (
 		hero.x == monster.x && hero.y == monster.y
