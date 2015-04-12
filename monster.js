@@ -149,10 +149,11 @@ var update = function (modifier) {
 			hero.y = hero.targety;
 		}
 	}
-		// Are they touching?
+		// Have we caught it?
     if (
-		hero.x == monster.x && hero.y == monster.y
-    ) {
+		hero.x == monster.x && (monster.y-oldy)*(hero.y-monster.y) >= 0 ||
+		hero.y == monster.y && (monster.x-oldx)*(hero.x-monster.x) >= 0 )	
+    {
         ++monstersCaught;
         reset();
     }
