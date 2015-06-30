@@ -29,11 +29,21 @@ mouseImage.onload = function () {
 };
 mouseImage.src = "images/mouse.png";
 
+// picks a direction
+// TO FIX: only positive direction currently!
+var choose_dir = function () {
+  mouse.speedx = Math.random();
+  mouse.speedy = 1 - mouse.speedx;
+}
+var time_elapsed = 0;
+
 // Game objects
 var cat = {
 	speed: 256 // movement in pixels per second
 };
-var mouse = {};
+var mouse = {
+  speed: 256
+};
 var miceCaught = 0;
 
 // Handle keyboard controls
@@ -59,18 +69,36 @@ var reset = function () {
 
 // Update game objects
 var update = function (modifier) {
-	if (38 in keysDown) { // Player holding up
+	if (38 in keysDown && cat.y - (cat.speed * modifier) > 0) { // Player holding up
 		cat.y -= cat.speed * modifier;
 	}
-	if (40 in keysDown) { // Player holding down
+	if (40 in keysDown && cat.y + 32 + (cat.speed * modifier) < canvas.height) { // Player holding down
 		cat.y += cat.speed * modifier;
 	}
-	if (37 in keysDown) { // Player holding left
+	if (37 in keysDown && cat.x - (cat.speed * modifier) > 0) { // Player holding left
 		cat.x -= cat.speed * modifier;
 	}
-	if (39 in keysDown) { // Player holding right
+	if (39 in keysDown && cat.x + 32 + (cat.speed * modifier) < canvas.width) { // Player holding right
 		cat.x += cat.speed * modifier;
 	}
+
+  // moves the mouse
+  time_elapsed += modifier;
+  if (time_elapsed > 1) {
+    choose_dir();
+    time_elapsed = 0;
+  }
+  //keep within bounds
+  // if (
+  //  mouse.x + mouse.speedx * modifier < canvas.width - 32 &&
+  //  mouse.x + mouse.speedx * modifier > 0
+  //  ) {}
+  // if (
+  //  mouse.y + mouse.speedy * modifier < canvas.height - 32 &&
+  //  mouse.y + mouse.speedy * modifier > 0
+  //  ) {}
+  mouse.x += mouse.speedx * modifier;
+  mouse.y += mouse.speedy * modifier;
 
 	// Are they touching?
 	if (
@@ -127,6 +155,7 @@ requestAnimationFrame = w.requestAnimationFrame || w.webkitRequestAnimationFrame
 // Let's play this game!
 var then = Date.now();
 reset();
+choose_dir();
 cat.x = canvas.width / 2;
 cat.y = canvas.height / 2;
 main();
