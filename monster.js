@@ -1,4 +1,6 @@
 // Create the canvas
+var howmanymice = 2
+
 var canvas = document.createElement("canvas");
 var ctx = canvas.getContext("2d");
 canvas.width = 512;
@@ -21,6 +23,15 @@ catImage.onload = function () {
 };
 catImage.src = "images/cat.png";
 
+// mouse array
+var mice = []
+for (var i=0; i < howmanymice; i++) {
+	var m = {
+	  speed: 256
+	};
+	mice.push(m)
+};
+
 // mouse image
 var mouseReady = false;
 var mouseImage = new Image();
@@ -30,20 +41,19 @@ mouseImage.onload = function () {
 mouseImage.src = "images/mouse.png";
 
 // picks a direction
-// TO FIX: only positive direction currently!
-var choose_dir = function () {
-  mouse.speedx = Math.random() * 2 - 1;
-  mouse.speedy = Math.random() * 2 - 1;
-}
+var choose_dir = function (m) {
+	m.speedx = Math.random() * 2 - 1;
+	m.speedy = Math.random() * 2 - 1;
+	}
 var time_elapsed = 0;
 
 // Game objects
 var cat = {
 	speed: 256 // movement in pixels per second
 };
-var mouse = {
-  speed: 256
-};
+//var mouse = {
+//  speed: 256
+//};
 var miceCaught = 0;
 
 // Handle keyboard controls
@@ -59,13 +69,18 @@ addEventListener("keyup", function (e) {
 
 // Reset the game when the player catches a mouse
 var reset = function () {
-	//cat.x = canvas.width / 2;
-	//cat.y = canvas.height / 2;
-
 	// Throw the mouse somewhere on the screen randomly
-	mouse.x = 32 + (Math.random() * (canvas.width - 64));
-	mouse.y = 32 + (Math.random() * (canvas.height - 64));
+	for (i=0; i<howmanymice; i++) {
+		mice[i].x = 32 + (Math.random() * (canvas.width - 64));
+		mice[i].y = 32 + (Math.random() * (canvas.height - 64));
+	}
 };
+
+var full_reset = function () {
+	reset();
+	cat.x = canvas.width / 2;
+	cat.y = canvas.height / 2;
+}
 
 // Update game objects
 var update = function (modifier) {
@@ -85,34 +100,41 @@ var update = function (modifier) {
   // moves the mouse
   time_elapsed += modifier;
   if (time_elapsed > 0.5) {
-    choose_dir();
+    for (i=0; i<howmanymice; i++) {
+			choose_dir(mice[i]);
+		}
     time_elapsed = 0;
   }
   //keep within bounds
-  if (
-   mouse.x + mouse.speedx * modifier * mouse.speed < canvas.width - 32 &&
-   mouse.x + mouse.speedx * modifier * mouse.speed> 0
-   ) {
-     mouse.x += mouse.speedx * modifier * mouse.speed;
-   }
-  if (
-   mouse.y + mouse.speedy * modifier * mouse.speed < canvas.height - 32 &&
-   mouse.y + mouse.speedy * modifier * mouse.speed > 0
-   ) {
-     mouse.y += mouse.speedy * modifier * mouse.speed;
-   }
-  //mouse.x += mouse.speedx * modifier * mouse.speed;
-  //mouse.y += mouse.speedy * modifier * mouse.speed;
+	for (i=0; i<howmanymice; i++) {
+		var mouse = mice[i];
+		if (
+	   mouse.x + mouse.speedx * modifier * mouse.speed < canvas.width - 32 &&
+	   mouse.x + mouse.speedx * modifier * mouse.speed> 0
+	   ) {
+	     mouse.x += mouse.speedx * modifier * mouse.speed;
+	   }
+	  if (
+	   mouse.y + mouse.speedy * modifier * mouse.speed < canvas.height - 32 &&
+	   mouse.y + mouse.speedy * modifier * mouse.speed > 0
+	   ) {
+	     mouse.y += mouse.speedy * modifier * mouse.speed;
+	   }
+	};
+
 
 	// Are they touching?
-	if (
-		cat.x <= (mouse.x + 32)
-		&& mouse.x <= (cat.x + 32)
-		&& cat.y <= (mouse.y + 32)
-		&& mouse.y <= (cat.y + 32)
-	) {
-		++miceCaught;
-		reset();
+	for (i=0; i<howmanymice; i++) {
+		var mouse = mice[i];
+		if (
+			cat.x <= (mouse.x + 32)
+			&& mouse.x <= (cat.x + 32)
+			&& cat.y <= (mouse.y + 32)
+			&& mouse.y <= (cat.y + 32)
+		) {
+			++miceCaught;
+			reset();
+		}
 	}
 };
 
@@ -127,7 +149,9 @@ var render = function () {
 	}
 
 	if (mouseReady) {
-		ctx.drawImage(mouseImage, mouse.x, mouse.y);
+		for (i=0; i<howmanymice; i++) {
+			ctx.drawImage(mouseImage, mice[i].x, mice[i].y);
+		}
 	}
 
 	// Score
@@ -158,8 +182,9 @@ requestAnimationFrame = w.requestAnimationFrame || w.webkitRequestAnimationFrame
 
 // Let's play this game!
 var then = Date.now();
-reset();
-choose_dir();
-cat.x = canvas.width / 2;
-cat.y = canvas.height / 2;
+full_reset();
+for (i=0; i<howmanymice; i++) {
+	choose_dir(mice[i]);
+}
+
 main();
