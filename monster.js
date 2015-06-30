@@ -32,8 +32,8 @@ mouseImage.src = "images/mouse.png";
 // picks a direction
 // TO FIX: only positive direction currently!
 var choose_dir = function () {
-  mouse.speedx = Math.random();
-  mouse.speedy = 1 - mouse.speedx;
+  mouse.speedx = Math.random() * 2 - 1;
+  mouse.speedy = Math.random() * 2 - 1;
 }
 var time_elapsed = 0;
 
@@ -84,21 +84,25 @@ var update = function (modifier) {
 
   // moves the mouse
   time_elapsed += modifier;
-  if (time_elapsed > 1) {
+  if (time_elapsed > 0.5) {
     choose_dir();
     time_elapsed = 0;
   }
   //keep within bounds
-  // if (
-  //  mouse.x + mouse.speedx * modifier < canvas.width - 32 &&
-  //  mouse.x + mouse.speedx * modifier > 0
-  //  ) {}
-  // if (
-  //  mouse.y + mouse.speedy * modifier < canvas.height - 32 &&
-  //  mouse.y + mouse.speedy * modifier > 0
-  //  ) {}
-  mouse.x += mouse.speedx * modifier;
-  mouse.y += mouse.speedy * modifier;
+  if (
+   mouse.x + mouse.speedx * modifier * mouse.speed < canvas.width - 32 &&
+   mouse.x + mouse.speedx * modifier * mouse.speed> 0
+   ) {
+     mouse.x += mouse.speedx * modifier * mouse.speed;
+   }
+  if (
+   mouse.y + mouse.speedy * modifier * mouse.speed < canvas.height - 32 &&
+   mouse.y + mouse.speedy * modifier * mouse.speed > 0
+   ) {
+     mouse.y += mouse.speedy * modifier * mouse.speed;
+   }
+  //mouse.x += mouse.speedx * modifier * mouse.speed;
+  //mouse.y += mouse.speedy * modifier * mouse.speed;
 
 	// Are they touching?
 	if (
