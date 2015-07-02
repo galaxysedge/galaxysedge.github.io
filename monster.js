@@ -68,16 +68,16 @@ addEventListener("keyup", function (e) {
 }, false);
 
 // Reset the game when the player catches a mouse
-var reset = function () {
+var reset = function (m) {
 	// Throw the mouse somewhere on the screen randomly
-	for (i=0; i<howmanymice; i++) {
-		mice[i].x = 32 + (Math.random() * (canvas.width - 64));
-		mice[i].y = 32 + (Math.random() * (canvas.height - 64));
-	}
+	m.x = 32 + (Math.random() * (canvas.width - 64));
+	m.y = 32 + (Math.random() * (canvas.height - 64));
 };
 
 var full_reset = function () {
-	reset();
+	for (i=0; i<howmanymice; i++) {
+		reset(mice[i]);
+	};
 	cat.x = canvas.width / 2;
 	cat.y = canvas.height / 2;
 }
@@ -133,7 +133,7 @@ var update = function (modifier) {
 			&& mouse.y <= (cat.y + 32)
 		) {
 			++miceCaught;
-			reset();
+			reset(mice[i]);
 		}
 	}
 };
