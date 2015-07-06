@@ -80,12 +80,7 @@ var keysDown = {};
 
 addEventListener("keydown", function (e) {
 	if (e.keyCode == 27) {
-		if (running) {
-			stop();
-		}
-		else {
-			start();
-		}
+		esc();
 	}
 	else {
 		keysDown[e.keyCode] = true;
@@ -95,6 +90,16 @@ addEventListener("keydown", function (e) {
 addEventListener("keyup", function (e) {
 	delete keysDown[e.keyCode];
 }, false);
+
+// Escape
+var esc = function () {
+	if (running) {
+		stop();
+	}
+	else {
+		start();
+	}
+};
 
 // Start game
 function start () {
@@ -151,9 +156,6 @@ var update = function (modifier) {
 	}
 	if (39 in keysDown && cat.x + 32 + (cat.speed * modifier) < canvas.width) { // Player holding right
 		cat.x += cat.speed * modifier;
-	}
-	if (27 in keysDown) { // escape button
-		stop();
 	}
 
   // moves the mouse
@@ -291,4 +293,11 @@ for (i=0; i<howmanydogs; i++) {
 	choose_dir(dogs[i]);
 }
 
-main();
+// function to start the game
+var stophandler = null
+function startGame( callback ) {
+	if (callback) {
+		esc = callback;
+	};
+	main();
+}
