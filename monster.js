@@ -1,6 +1,7 @@
 // Create the canvas
-var howmanymice = 3
-var howmanydogs = 2
+var howmanymice = 3;
+var howmanydogs = 2;
+var running = true;
 
 var canvas = document.createElement("canvas");
 var ctx = canvas.getContext("2d");
@@ -78,12 +79,45 @@ var miceCaught = 0;
 var keysDown = {};
 
 addEventListener("keydown", function (e) {
-	keysDown[e.keyCode] = true;
+	if (e.keyCode == 27) {
+		if (running) {
+			stop();
+		}
+		else {
+			start();
+		}
+	}
+	else {
+		keysDown[e.keyCode] = true;
+	};
 }, false);
 
 addEventListener("keyup", function (e) {
 	delete keysDown[e.keyCode];
 }, false);
+
+// Start game
+function start () {
+	running = true;
+	then = Date.now();
+	requestAnimationFrame(main);
+}
+
+// Stop game
+function stop () {
+	running = false;
+	keysDown = {};
+}
+
+// End of game
+function die () {
+	stop();
+	var r = confirm("You have died! Play again?");
+	if (r == true) {
+    full_reset();
+		start();
+	};
+}
 
 // Reset the game when the player catches a mouse
 var reset = function (m) {
@@ -101,6 +135,7 @@ var full_reset = function () {
 	};
 	cat.x = canvas.width / 2;
 	cat.y = canvas.height / 2;
+	miceCaught = 0;
 }
 
 // Update game objects
@@ -116,6 +151,9 @@ var update = function (modifier) {
 	}
 	if (39 in keysDown && cat.x + 32 + (cat.speed * modifier) < canvas.width) { // Player holding right
 		cat.x += cat.speed * modifier;
+	}
+	if (27 in keysDown) { // escape button
+		stop();
 	}
 
   // moves the mouse
@@ -186,6 +224,7 @@ var update = function (modifier) {
 			&& d.y <= (cat.y + 32)
 		) {
 			console.log("Got by the dog!")
+			die();
 		}
 	}
 };
@@ -233,7 +272,9 @@ var main = function () {
 	then = now;
 
 	// Request to do this again ASAP
-	requestAnimationFrame(main);
+	if (running) {
+		requestAnimationFrame(main);
+	};
 };
 
 // Cross-browser support for requestAnimationFrame

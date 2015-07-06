@@ -7,7 +7,20 @@
   </head>
   <body>
 
-    <script src="monster.js"></script>
-
+    <script src="monster.js"></script><br>
+    <button id="startstopButton" onclick="startstop()">Pause</button>
+    <script>
+      function startstop () {
+        var b = document.getElementById('startstopButton');
+        if (running) {
+          stop();
+          b.textContent = "Start";
+        }
+        else {
+          start();
+          b.textContent = "Pause";
+        }
+      };
+    </script>
   </body>
 </html>
