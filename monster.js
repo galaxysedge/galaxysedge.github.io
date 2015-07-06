@@ -1,5 +1,6 @@
 // Create the canvas
-var howmanymice = 2
+var howmanymice = 3
+var howmanydogs = 2
 
 var canvas = document.createElement("canvas");
 var ctx = canvas.getContext("2d");
@@ -23,6 +24,14 @@ catImage.onload = function () {
 };
 catImage.src = "images/cat.png";
 
+// dog image
+var dogReady = false;
+var dogImage = new Image();
+dogImage.onload = function () {
+	dogReady = true;
+};
+dogImage.src = "images/monster.png"
+
 // mouse array
 var mice = []
 for (var i=0; i < howmanymice; i++) {
@@ -31,6 +40,15 @@ for (var i=0; i < howmanymice; i++) {
 	};
 	mice.push(m)
 };
+
+// dog array
+var dogs = []
+for (var i=0; i < howmanydogs; i++) {
+	var d = {
+		speed: 256
+	};
+	dogs.push(d)
+}
 
 // mouse image
 var mouseReady = false;
@@ -78,6 +96,9 @@ var full_reset = function () {
 	for (i=0; i<howmanymice; i++) {
 		reset(mice[i]);
 	};
+	for (i=0; i<howmanydogs; i++) {
+		reset(dogs[i]);
+	};
 	cat.x = canvas.width / 2;
 	cat.y = canvas.height / 2;
 }
@@ -103,9 +124,12 @@ var update = function (modifier) {
     for (i=0; i<howmanymice; i++) {
 			choose_dir(mice[i]);
 		}
+		for (i=0; i<howmanydogs; i++) {
+			choose_dir(dogs[i]);
+		}
     time_elapsed = 0;
   }
-  //keep within bounds
+  //move dog/mice, keep within bounds
 	for (i=0; i<howmanymice; i++) {
 		var mouse = mice[i];
 		if (
@@ -122,6 +146,22 @@ var update = function (modifier) {
 	   }
 	};
 
+	for (i=0; i<howmanydogs; i++) {
+		var dog = dogs[i];
+		if (
+	   dog.x + dog.speedx * modifier * dog.speed < canvas.width - 32 &&
+	   dog.x + dog.speedx * modifier * dog.speed> 0
+	   ) {
+	     dog.x += dog.speedx * modifier * dog.speed;
+	   }
+	  if (
+	   dog.y + dog.speedy * modifier * dog.speed < canvas.height - 32 &&
+	   dog.y + dog.speedy * modifier * dog.speed > 0
+	   ) {
+	     dog.y += dog.speedy * modifier * dog.speed;
+	   }
+	};
+
 
 	// Are they touching?
 	for (i=0; i<howmanymice; i++) {
@@ -134,6 +174,18 @@ var update = function (modifier) {
 		) {
 			++miceCaught;
 			reset(mice[i]);
+		}
+	}
+
+	for (i=0; i<howmanydogs; i++) {
+		var d = dogs[i];
+		if (
+			cat.x <= (d.x + 32)
+			&& d.x <= (cat.x + 32)
+			&& cat.y <= (d.y + 32)
+			&& d.y <= (cat.y + 32)
+		) {
+			console.log("Got by the dog!")
 		}
 	}
 };
@@ -153,6 +205,14 @@ var render = function () {
 			ctx.drawImage(mouseImage, mice[i].x, mice[i].y);
 		}
 	}
+
+	if (dogReady) {
+		for (i=0; i<howmanydogs; i++) {
+			ctx.drawImage(dogImage, dogs[i].x, dogs[i].y);
+		}
+	}
+
+
 
 	// Score
 	ctx.fillStyle = "rgb(250, 250, 250)";
@@ -185,6 +245,9 @@ var then = Date.now();
 full_reset();
 for (i=0; i<howmanymice; i++) {
 	choose_dir(mice[i]);
+}
+for (i=0; i<howmanydogs; i++) {
+	choose_dir(dogs[i]);
 }
 
 main();
