@@ -2,6 +2,7 @@
 var howmanymice = 3;
 var howmanydogs = 2;
 var running = true;
+var highScore = 0;
 
 var canvas = document.createElement("canvas");
 var ctx = canvas.getContext("2d");
@@ -101,6 +102,13 @@ var esc = function () {
 	}
 };
 
+//display high score
+function displayHS () {
+	var s = document.getElementById('score');
+	var hs = "High Score: "+highScore;
+	s.innerHTML = hs;
+};
+
 // Start game
 function start () {
 	running = true;
@@ -129,17 +137,27 @@ var reset = function (m) {
 	// Throw the mouse somewhere on the screen randomly
 	m.x = 32 + (Math.random() * (canvas.width - 64));
 	m.y = 32 + (Math.random() * (canvas.height - 64));
+	while (
+		cat.x <= (m.x + 32)
+		&& m.x <= (cat.x + 32)
+		&& cat.y <= (m.y + 32)
+		&& m.y <= (cat.y + 32)
+		) {
+		m.x = 32 + (Math.random() * (canvas.width - 64));
+		m.y = 32 + (Math.random() * (canvas.height - 64));
+	};
 };
 
 var full_reset = function () {
+	cat.x = canvas.width / 2;
+	cat.y = canvas.height / 2;
 	for (i=0; i<howmanymice; i++) {
 		reset(mice[i]);
 	};
 	for (i=0; i<howmanydogs; i++) {
 		reset(dogs[i]);
 	};
-	cat.x = canvas.width / 2;
-	cat.y = canvas.height / 2;
+
 	miceCaught = 0;
 }
 
@@ -225,7 +243,10 @@ var update = function (modifier) {
 			&& cat.y <= (d.y + 32)
 			&& d.y <= (cat.y + 32)
 		) {
-			console.log("Got by the dog!")
+			if (miceCaught > highScore) {
+				highScore = miceCaught;
+			};
+			full_reset();
 			die();
 		}
 	}
@@ -272,7 +293,8 @@ var main = function () {
 	render();
 
 	then = now;
-
+	displayHS();
+	//displayHS();
 	// Request to do this again ASAP
 	if (running) {
 		requestAnimationFrame(main);
