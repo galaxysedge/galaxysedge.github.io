@@ -1,0 +1,131 @@
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" 
+ href="//fonts.googleapis.com/css?family=Raleway:400,300,600" 
+ type="text/css">
+<link rel="stylesheet" href="css/normalize.css" type="text/css">
+<link rel="stylesheet" href="css/skeleton.css" type="text/css">
+
+<style>
+.sidebar {
+    background-color: #9fdfc0;
+    width: 150px;
+    margin-top:50px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    color: white;
+    padding-left:10px;
+}
+
+.sidebar h2 {
+    color: black;
+}
+
+.photos {
+    padding-left:15px;
+    padding-top:0px;
+    background-color: #c6ecda;
+    position: absolute;
+    margin-top:50px;
+    top: 0;
+    right:0;
+    left: 150px;
+    bottom: 0;
+    
+    -moz-transition: left 0.5s ease;
+    transition: left 0.5s ease;
+}
+
+input[type=checkbox] {
+   display: none;
+}
+
+input:checked ~ .photos { 
+    left: 0;
+}
+
+input:checked ~ label {
+    left: 0;
+}
+
+label {
+    z-index: 2;
+    position: absolute;
+    top: 45px;
+    left: 140px;
+    
+    
+    -moz-transition: left 0.5s ease;
+    transition: left 0.5s ease;
+}
+
+#header {
+    margin:0;
+    padding:1em 0 1em 0;
+    position: fixed;
+    height: 50px;
+	width:100%;
+    background-color:#2d865c;
+    color:white;
+    text-align:center;
+}
+</style>
+
+<script>
+function namechange() {
+    if (document.getElementById("closesidebar").innerHTML=="&gt;") {
+        document.getElementById("closesidebar").innerHTML="&lt;"
+    }
+    else if (document.getElementById("closesidebar").innerHTML=="&lt;") {
+        document.getElementById("closesidebar").innerHTML="&gt;"
+    }
+}
+</script>
+</head>
+
+
+
+<body>
+<div id="header">
+Header here
+</div>
+<div class="main-wrap">
+    <input id="slide-sidebar" type="checkbox" role="button" />
+        <label for="slide-sidebar"><span id="closesidebar" onclick="namechange()">&lt;</span></label>
+        
+        
+    <div class="sidebar">
+    <h4>Links</h4>
+    </div>
+    
+    
+    <div class="photos">
+    <h4>Photographs</h4>
+    
+    
+        <center><table>
+      <tr>
+ 	<td><a href="http://kappa.ac93.org/~mama/2015/january/january.html"><img src="http://kappa.ac93.org/~mama/2015/january/misc/thumbnails/1726.jpg"></a></td>       
+ 	<td><a href="http://kappa.ac93.org/~mama/2015/february/february.html"><img src="http://kappa.ac93.org/~mama/2015/february/Carnevale/thumbnails/2789.jpg"></a></td>       
+ 	<td><a href="http://kappa.ac93.org/~mama/2015/march/march.html"><img src="http://kappa.ac93.org/~mama/2015/march/Wisley/thumbnails/3428.jpg"></a></td>       
+ 	<td><a href="http://kappa.ac93.org/~mama/2015/april/april.html"><img src="http://kappa.ac93.org/~mama/2015/april/Riga/thumbnails/3766.jpg"></a></td>       
+    </tr>	  
+      <tr>
+        <td> <font color=#ffffff>January</font></td>
+        <td> <font color=#ffffff>February</font></td>
+        <td> <font color=#ffffff>March</font></td>
+        <td> <font color=#ffffff>April</font></td>
+      </tr>
+      </td>
+      </table></center>
+      
+      
+    </div>
+</div>
+
+</body>
+
+</html>
