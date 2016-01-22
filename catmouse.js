@@ -1,6 +1,4 @@
 // Create the canvas
-var howmanymice = 3;
-var howmanydogs = 2;
 var running = true;
 var highScore = 0;
 
@@ -34,23 +32,42 @@ dogImage.onload = function () {
 };
 dogImage.src = "images/dog.png"
 
+// levels
+var levels = [
+	{
+		mice:3,
+		dogs:0,
+		next:10
+	},
+	{
+		mice:3,
+		dogs:1,
+		next:20
+	},
+	{
+		mice:3,
+		dogs:2,
+		next:30
+	},
+	{
+		mice:3,
+		dogs:3,
+		next:40
+	},
+	{
+		mice:3,
+		dogs:4,
+
+	}
+]
+
 // mouse array
 var mice = []
-for (var i=0; i < howmanymice; i++) {
-	var m = {
-	  speed: 256
-	};
-	mice.push(m)
-};
 
 // dog array
 var dogs = []
-for (var i=0; i < howmanydogs; i++) {
-	var d = {
-		speed: 256
-	};
-	dogs.push(d)
-}
+
+var target = 0;
 
 // mouse image
 var mouseReady = false;
@@ -127,7 +144,8 @@ function die () {
 	stop();
 	var r = confirm("You have died! Play again?");
 	if (r == true) {
-    full_reset();
+		lvl = 0;
+    full_reset(levels[lvl]);
 		start();
 	};
 }
@@ -148,9 +166,29 @@ var reset = function (m) {
 	};
 };
 
-var full_reset = function () {
+var full_reset = function (config) {
+	mice = [];
+	dogs = [];
 	cat.x = canvas.width / 2;
 	cat.y = canvas.height / 2;
+	var howmanymice = config['mice'];
+	var howmanydogs = config['dogs'];
+	target = config['next'];
+
+	for (var i=0; i < howmanymice; i++) {
+		var m = {
+		  speed: 256
+		};
+		mice.push(m)
+	};
+
+	for (var i=0; i < howmanydogs; i++) {
+		var d = {
+			speed: 256
+		};
+		dogs.push(d)
+	}
+
 	for (i=0; i<howmanymice; i++) {
 		reset(mice[i]);
 	};
@@ -158,7 +196,10 @@ var full_reset = function () {
 		reset(dogs[i]);
 	};
 
-	miceCaught = 0;
+	if (lvl == 0) {
+		miceCaught = 0;
+	};
+
 }
 
 // Update game objects
@@ -179,16 +220,16 @@ var update = function (modifier) {
   // moves the mouse
   time_elapsed += modifier;
   if (time_elapsed > 0.5) {
-    for (i=0; i<howmanymice; i++) {
+    for (i=0; i<mice.length; i++) {
 			choose_dir(mice[i]);
 		}
-		for (i=0; i<howmanydogs; i++) {
+		for (i=0; i<dogs.length; i++) {
 			choose_dir(dogs[i]);
 		}
     time_elapsed = 0;
   }
   //move dog/mice, keep within bounds
-	for (i=0; i<howmanymice; i++) {
+	for (i=0; i<mice.length; i++) {
 		var mouse = mice[i];
 		if (
 	   mouse.x + mouse.speedx * modifier * mouse.speed < canvas.width - 32 &&
@@ -204,7 +245,7 @@ var update = function (modifier) {
 	   }
 	};
 
-	for (i=0; i<howmanydogs; i++) {
+	for (i=0; i<dogs.length; i++) {
 		var dog = dogs[i];
 		if (
 	   dog.x + dog.speedx * modifier * dog.speed < canvas.width - 32 &&
@@ -222,7 +263,7 @@ var update = function (modifier) {
 
 
 	// Are they touching?
-	for (i=0; i<howmanymice; i++) {
+	for (i=0; i<mice.length; i++) {
 		var mouse = mice[i];
 		if (
 			cat.x <= (mouse.x + 32)
@@ -231,11 +272,16 @@ var update = function (modifier) {
 			&& mouse.y <= (cat.y + 32)
 		) {
 			++miceCaught;
+			if (miceCaught >= target && lvl < levels.length - 1) {
+				++lvl;
+				full_reset(levels[lvl])
+				return
+			}
 			reset(mice[i]);
 		}
 	}
 
-	for (i=0; i<howmanydogs; i++) {
+	for (i=0; i<dogs.length; i++) {
 		var d = dogs[i];
 		if (
 			cat.x <= (d.x + 32)
@@ -246,7 +292,6 @@ var update = function (modifier) {
 			if (miceCaught > highScore) {
 				highScore = miceCaught;
 			};
-			full_reset();
 			die();
 		}
 	}
@@ -263,13 +308,13 @@ var render = function () {
 	}
 
 	if (mouseReady) {
-		for (i=0; i<howmanymice; i++) {
+		for (i=0; i<mice.length; i++) {
 			ctx.drawImage(mouseImage, mice[i].x, mice[i].y);
 		}
 	}
 
 	if (dogReady) {
-		for (i=0; i<howmanydogs; i++) {
+		for (i=0; i<dogs.length; i++) {
 			ctx.drawImage(dogImage, dogs[i].x, dogs[i].y);
 		}
 	}
@@ -307,11 +352,12 @@ requestAnimationFrame = w.requestAnimationFrame || w.webkitRequestAnimationFrame
 
 // Let's play this game!
 var then = Date.now();
-full_reset();
-for (i=0; i<howmanymice; i++) {
+var lvl = 0;
+full_reset(levels[lvl]);
+for (i=0; i<mice.length; i++) {
 	choose_dir(mice[i]);
 }
-for (i=0; i<howmanydogs; i++) {
+for (i=0; i<dogs.length; i++) {
 	choose_dir(dogs[i]);
 }
 
